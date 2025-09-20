@@ -85,8 +85,18 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
         console.log('Post created successfully!');
     };
 
+    const handleModalOpenClose = (isOpen: boolean) => {
+        if (!isOpen) {
+            setStep('camera');
+            setCapturedImage(null);
+            setCaption('');
+            setIsLoading(false);
+        }
+        onOpenChange(isOpen);
+    };
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={handleModalOpenClose}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle className="font-bold font-lato">
