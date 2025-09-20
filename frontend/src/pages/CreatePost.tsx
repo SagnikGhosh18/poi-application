@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Camera, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,12 +20,48 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
     const [caption, setCaption] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Camera refs and state
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+    const streamRef = useRef<MediaStream | null>(null);
+
+    useEffect(() => {
+        if (step === 'camera' && open) {
+            navigator.mediaDevices
+                .getUserMedia({ video: true })
+                .then(stream => {
+                    streamRef.current = stream;
+                    if (videoRef.current) {
+                        videoRef.current.srcObject = stream;
+                        videoRef.current.play();
+                    }
+                })
+                .catch(err => {
+                    // Handle error (permission denied, etc)
+                    console.error('Camera error:', err);
+                });
+        }
+        // Cleanup on close or step change
+        return () => {
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop());
+                streamRef.current = null;
+            }
+        };
+    }, [step, open]);
+
     const handleCapture = () => {
-        // Simulate image capture
-        setCapturedImage(
-            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=600&fit=crop'
-        );
-        setStep('preview');
+        const video = videoRef.current;
+        if (!video) return;
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/png');
+            setCapturedImage(dataUrl);
+            setStep('preview');
+        }
     };
 
     const handleRetake = () => {
@@ -60,19 +96,16 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
 
                 {step === 'camera' && (
                     <div className="space-y-4">
-                        {/* Camera placeholder */}
-                        <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                            <div className="text-center text-muted-foreground">
-                                <Camera className="h-16 w-16 mx-auto mb-2" />
-                                <p className="font-lato">
-                                    Camera access needed
-                                </p>
-                                <p className="text-sm font-light font-lato">
-                                    Click capture to simulate taking a photo
-                                </p>
-                            </div>
+                        {/* Camera preview */}
+                        <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                            <video
+                                ref={videoRef}
+                                className="w-full h-full object-cover rounded-lg"
+                                autoPlay
+                                playsInline
+                                muted
+                            />
                         </div>
-
                         <Button
                             onClick={handleCapture}
                             className="w-full font-lato"
