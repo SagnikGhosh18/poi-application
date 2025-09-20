@@ -66,14 +66,12 @@ const mockPosts = [
 const Timeline = () => {
     return (
         <div className="w-full max-w-4xl mx-auto px-4">
-            {/* Mobile: Single column Instagram-style */}
-            <div className="md:hidden">
+            <div className="md:hidden flex flex-col gap-4">
                 {mockPosts.map(post => (
                     <PostCard key={post.id} {...post} />
                 ))}
             </div>
 
-            {/* Desktop: Pinterest-style masonry grid */}
             <div className="hidden md:block">
                 <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
                     {mockPosts.map(post => (

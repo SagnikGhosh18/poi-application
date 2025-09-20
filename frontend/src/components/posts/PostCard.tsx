@@ -55,64 +55,64 @@ const PostCard = ({
     };
 
     return (
-        <Card className="overflow-hidden shadow-card hover:shadow-hover transition-smooth mb-6">
+        <Card className="bg-white border border-gray-200 shadow-none rounded-lg mb-0 overflow-hidden">
             {/* Post Header */}
-            <div className="p-4 pb-3">
+            <div className="px-4 py-3 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                    <span className="font-bold text-foreground font-lato">
+                    <span className="font-semibold text-sm text-gray-900">
                         {username}
                     </span>
-                    <span className="text-sm font-light text-muted-foreground font-lato">
+                    <span className="text-xs text-gray-500 font-normal">
                         {timestamp}
                     </span>
                 </div>
             </div>
 
             {/* Image */}
-            <div className="relative">
+            <div className="relative aspect-square bg-gray-50">
                 <img
                     src={imageUrl}
                     alt={`Post by ${username}`}
-                    className="w-full h-auto object-cover"
+                    className="w-full h-full object-cover"
                 />
             </div>
 
             {/* Action Bar */}
-            <div className="p-4 pt-3">
-                <div className="flex items-center gap-4 mb-3">
+            <div className="px-4 py-3">
+                <div className="flex items-center justify-between mb-3">
                     <Button
                         variant="ghost"
                         size="sm"
-                        className={`flex items-center gap-2 p-0 h-auto font-light ${
+                        className={`flex items-center gap-2 p-0 h-auto hover:bg-transparent transition-all duration-200 ${
                             liked
-                                ? 'text-like hover:text-like'
-                                : 'text-muted-foreground hover:text-like'
+                                ? 'text-red-500 hover:text-red-600'
+                                : 'text-gray-900 hover:text-gray-600'
                         }`}
                         onClick={handleLike}
                     >
                         <Heart
-                            className={`h-5 w-5 transition-smooth ${
-                                liked ? 'fill-current' : ''
+                            className={`h-6 w-6 transition-all duration-200 ${
+                                liked ? 'fill-current scale-110' : 'hover:scale-110'
                             }`}
                         />
-                        <span className="font-lato">{likes}</span>
+                        <span className="text-sm font-semibold">{likes}</span>
                     </Button>
 
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="flex items-center gap-2 p-0 h-auto text-muted-foreground hover:text-primary font-light"
+                        className="flex items-center gap-2 p-0 h-auto text-gray-900 hover:text-gray-600 hover:bg-transparent transition-all duration-200"
                         onClick={handleShare}
                     >
-                        <Share className="h-5 w-5" />
-                        <span className="font-lato">{shares}</span>
+                        <Share className="h-6 w-6 hover:scale-110 transition-all duration-200" />
+                        <span className="text-sm font-semibold">{shares}</span>
                     </Button>
                 </div>
 
                 {/* Caption */}
-                <div className="text-sm">
-                    <span className="font-bold font-lato mr-2">{username}</span>
-                    <span className="font-lato">{caption}</span>
+                <div className="text-sm leading-relaxed">
+                    <span className="font-semibold text-gray-900 mr-2">{username}</span>
+                    <span className="text-gray-900">{caption}</span>
                 </div>
             </div>
         </Card>
