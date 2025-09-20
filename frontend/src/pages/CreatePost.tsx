@@ -8,6 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { createPost } from '@/lib/api';
 
 interface CreatePostModalProps {
     open: boolean;
@@ -71,8 +72,9 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
 
     const handlePost = async () => {
         setIsLoading(true);
+        const token = localStorage.getItem('token');
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await createPost(token!, capturedImage!, caption);
 
         // Reset form and close modal
         setStep('camera');

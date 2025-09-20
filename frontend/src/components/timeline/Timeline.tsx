@@ -1,4 +1,17 @@
+import { useEffect, useState } from 'react';
 import PostCard from '../posts/PostCard';
+import { getPosts } from '@/lib/api';
+
+interface Post {
+    id: string;
+    username: string;
+    imageUrl: string;
+    caption: string;
+    timestamp: string;
+    initialLikes: number;
+    initialShares: number;
+    isLiked?: boolean;
+}
 
 // Mock data for demonstration
 const mockPosts = [
@@ -64,6 +77,24 @@ const mockPosts = [
 ];
 
 const Timeline = () => {
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Replace with your auth token logic
+        try {
+            const token = localStorage.getItem('token');
+            getPosts(token!)
+                .then(data => setPosts(data.posts))
+                .finally(() => setLoading(false));
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+            setLoading(false);
+        }
+    }, []);
+
+    if (loading) return <div>Loading...</div>;
+
     return (
         <div className="w-full max-w-4xl mx-auto px-4">
             <div className="md:hidden flex flex-col gap-4">
@@ -74,7 +105,7 @@ const Timeline = () => {
 
             <div className="hidden md:block">
                 <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
-                    {mockPosts.map(post => (
+                    {posts.map(post => (
                         <div key={post.id} className="break-inside-avoid mb-6">
                             <PostCard {...post} />
                         </div>

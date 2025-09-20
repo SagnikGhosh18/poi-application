@@ -2,6 +2,7 @@ import { Heart, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useState } from 'react';
+import { likePost, unlikePost, sharePost } from '@/lib/api';
 
 interface PostCardProps {
     id: string;
@@ -15,6 +16,7 @@ interface PostCardProps {
 }
 
 const PostCard = ({
+    id,
     username,
     imageUrl,
     caption,
@@ -27,30 +29,28 @@ const PostCard = ({
     const [shares, setShares] = useState(initialShares);
     const [liked, setLiked] = useState(isLiked);
 
-    const handleLike = () => {
+    const handleLike = async () => {
         setLiked(!liked);
         setLikes(liked ? likes - 1 : likes + 1);
-        // TODO: Send API request to update like status
+        const token = localStorage.getItem('token');
+        try {
+            if (!liked) await likePost(token!, id);
+            else await unlikePost(token!, id);
+        } catch (e) {
+            // Optionally revert UI on error
+            setLiked(liked);
+
+        }
     };
 
     const handleShare = async () => {
+        // ...existing share logic
+        setShares(shares + 1);
+        const token = localStorage.getItem('token');
         try {
-            if (navigator.share) {
-                await navigator.share({
-                    title: `${username}'s post on Vistagram`,
-                    text: caption,
-                    url: window.location.href,
-                });
-            } else {
-                // Fallback: copy to clipboard
-                await navigator.clipboard.writeText(window.location.href);
-                // TODO: Show toast notification
-                console.log('Link copied to clipboard!');
-            }
-            setShares(shares + 1);
-            // TODO: Send API request to update share count
-        } catch (error) {
-            console.error('Error sharing:', error);
+            await sharePost(token!, id);
+        } catch (e) {
+            // Optionally revert UI on error
         }
     };
 
