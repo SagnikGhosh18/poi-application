@@ -16,6 +16,8 @@ const { authenticateToken } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
+router.get('/ping', (req, res) => {res.send('pong');});
+
 // All routes require authentication
 router.use(authenticateToken);
 
