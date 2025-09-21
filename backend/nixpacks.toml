@@ -1,0 +1,6 @@
+# backend/nixpacks.toml
+
+[phases.setup]
+# This tells Nixpacks to install the PostgreSQL package, 
+# which includes the `psql` command-line client.
+pkgs = ["postgresql"]
