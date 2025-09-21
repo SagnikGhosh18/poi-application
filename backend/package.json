@@ -10,7 +10,11 @@
     "db:setup": "cat src/scripts/ddl.sql | docker-compose exec -T postgres psql -U postgres -d poi_sharing_app",
     "db:seed": "cat src/scripts/seed.sql | docker-compose exec -T postgres psql -U postgres -d poi_sharing_app",
     "db:init": "npm run db:setup && npm run db:seed",
-    "db:reset": "docker-compose down -v && docker-compose up -d postgres && npm run db:init"
+    "db:reset": "docker-compose down -v && docker-compose up -d postgres && npm run db:init",
+    "build": "npm install",
+    "railway:migrate": "node -e \"require('child_process').exec('cat src/scripts/ddl.sql | psql \\$DATABASE_URL', (err,stdout,stderr) => { if(err) console.error(err); else console.log('Migration complete'); })\"",
+    "railway:seed": "node -e \"require('child_process').exec('cat src/scripts/seed.sql | psql \\$DATABASE_URL', (err,stdout,stderr) => { if(err) console.error(err); else console.log('Seed complete'); })\"",
+    "postdeploy": "npm run railway:migrate && npm run railway:seed"
   },
   "dependencies": {
     "aws-sdk": "^2.1469.0",
@@ -40,6 +44,9 @@
     "mobile",
     "api"
   ],
+  "engines": {
+    "node": "22.x"
+  },
   "author": "Your Name",
   "license": "MIT"
 }
