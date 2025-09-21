@@ -103,17 +103,15 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
             // Call the API function with the FormData object
             await createPost(token!, formData);
 
-            await getPosts(token!); 
-
             // Reset form and close modal on success
             setStep('camera');
             setCapturedImage(null);
             setCaption('');
             onOpenChange(false);
-            
+
+            window.location.reload();
             // NOTE: You'll likely want to add success handling here
             // (e.g., show a toast, refetch the posts on your feed)
-            console.log('Post created successfully!');
         } catch (error) {
             console.error('Failed to create post:', error);
             // NOTE: Add user-facing error handling here

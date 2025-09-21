@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { login, signup } from '@/services/authService';
-import { redirect } from 'react-router-dom';
 
 interface AuthModalProps {
     open: boolean;
@@ -45,7 +44,7 @@ export default function AuthModal({
             setError('');
 
             onOpenChange(false);
-            redirect('/');
+            window.location.reload();
         } catch (err: any) {
             setError(err.message);
         } finally {

@@ -17,7 +17,6 @@ const Header = () => {
                     Visitagram
                 </h1>
 
-                {/* Create Post button - only visible on tablet/desktop */}
                 <Button
                     variant="ghost"
                     size="icon"

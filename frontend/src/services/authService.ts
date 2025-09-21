@@ -33,7 +33,7 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             // Token expired or invalid
             removeToken();
-            window.location.href = '/login'; // Redirect to login
+            window.location.href = '/'; // Redirect to login
         }
         
         // Extract error message
