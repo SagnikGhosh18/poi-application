@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Camera, RotateCcw } from 'lucide-react';
+import { Camera, RotateCcw, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { createPost, getPosts } from '@/lib/api';
+import { createPost } from '@/lib/api';
 
 // Helper function to convert a Base64 data URL into a Blob object
 function dataURLtoBlob(dataurl: string): Blob {
@@ -38,10 +38,19 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
 
+    // 2. Add a ref for the hidden file input
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
     useEffect(() => {
         if (step === 'camera' && open) {
+            const constraints = {
+                video: {
+                    facingMode: { ideal: 'environment' },
+                },
+            };
+
             navigator.mediaDevices
-                .getUserMedia({ video: true })
+                .getUserMedia(constraints) // Use the new constraints
                 .then(stream => {
                     streamRef.current = stream;
                     if (videoRef.current) {
@@ -51,6 +60,7 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
                 })
                 .catch(err => {
                     console.error('Camera error:', err);
+                    // If the ideal camera fails, you could try again with `video: true` as a fallback
                 });
         }
         // Cleanup on close or step change
@@ -61,6 +71,25 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
             }
         };
     }, [step, open]);
+
+    // 3. Add a function to handle the file selection
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // The result is a Base64 data URL, which fits our existing state
+                setCapturedImage(reader.result as string);
+                setStep('preview');
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // 4. Add a function to trigger the hidden file input
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
 
     const handleCapture = () => {
         const video = videoRef.current;
@@ -88,13 +117,13 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
 
         try {
             const token = localStorage.getItem('token');
-            
+
             // Convert the Base64 data URL to a Blob
             const imageBlob = dataURLtoBlob(capturedImage);
 
             // Create a FormData object for the multipart request
             const formData = new FormData();
-            
+
             // Append the image file (as a blob) and the caption
             // The field name 'image' must match what multer expects on the backend
             formData.append('image', imageBlob, 'capture.png');
@@ -135,13 +164,12 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle className="font-bold font-lato">
-                        {step === 'camera' ? 'Take a Photo' : 'Create Post'}
+                        {step === 'camera' ? 'Choose a Photo' : 'Create Post'}
                     </DialogTitle>
                 </DialogHeader>
 
                 {step === 'camera' && (
                     <div className="space-y-4">
-                        {/* Camera preview */}
                         <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
                             <video
                                 ref={videoRef}
@@ -151,14 +179,34 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
                                 muted
                             />
                         </div>
-                        <Button
-                            onClick={handleCapture}
-                            className="w-full font-lato"
-                            size="lg"
-                        >
-                            <Camera className="h-5 w-5 mr-2" />
-                            Capture
-                        </Button>
+                        <div className="flex flex-col gap-3">
+                            <Button
+                                onClick={handleCapture}
+                                className="w-full font-lato"
+                                size="lg"
+                            >
+                                <Camera className="h-5 w-5 mr-2" />
+                                Capture from Camera
+                            </Button>
+
+                            {/* 5. Add the UI for uploading a file */}
+                            <Button
+                                variant="outline"
+                                onClick={handleUploadClick}
+                                className="w-full font-lato"
+                                size="lg"
+                            >
+                                <Upload className="h-5 w-5 mr-2" />
+                                Or Upload an Image
+                            </Button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept="image/png, image/jpeg, image/gif"
+                                className="hidden"
+                            />
+                        </div>
                     </div>
                 )}
 
