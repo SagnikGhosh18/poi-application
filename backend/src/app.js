@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth.routes');
-// const postRoutes = require('./routes/posts.routes');
+const postRoutes = require('./routes/posts.routes');
 // const uploadRoutes = require('./routes/upload.routes');
 const errorHandler = require('./middleware/error.middleware');
 const logger = require('./utils/logger');
@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/posts', postRoutes);
+app.use('/api/posts', postRoutes);
 // app.use('/api/upload', uploadRoutes);
 
 // Health check

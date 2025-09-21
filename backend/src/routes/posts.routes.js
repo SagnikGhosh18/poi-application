@@ -11,7 +11,7 @@ const {
     getPostStats,
     getPostLikes
 } = require('../controllers/posts.controller');
-const { validate, schemas } = require('../utils/validation');
+const { validate, schemas } = require('../utils/validations');
 const { authenticateToken } = require('../middleware/auth.middleware');
 
 const router = express.Router();

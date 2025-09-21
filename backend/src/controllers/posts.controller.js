@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const db = require('../config/db');
+const db = require('../config/database');
 
 // Helper to format post response
 function formatPost(post, currentUser) {
@@ -42,6 +42,7 @@ exports.createPost = async (req, res) => {
 // 2. Get All Posts (paginated)
 exports.getAllPosts = async (req, res) => {
     const username = req.user.username;
+    console.log("Here");
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const offset = (page - 1) * limit;

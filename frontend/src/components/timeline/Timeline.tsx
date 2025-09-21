@@ -95,10 +95,17 @@ const Timeline = () => {
 
     if (loading) return <div>Loading...</div>;
 
+    if (posts.length === 0)
+        return (
+            <div className="w-full max-w-4xl mx-auto px-4">
+                No posts available.
+            </div>
+        );
+
     return (
         <div className="w-full max-w-4xl mx-auto px-4">
             <div className="md:hidden flex flex-col gap-4">
-                {mockPosts.map(post => (
+                {posts.map(post => (
                     <PostCard key={post.id} {...post} />
                 ))}
             </div>
