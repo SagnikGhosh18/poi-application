@@ -15,7 +15,7 @@ const App = () => {
         if (!getToken()) setShowAuth(true);
     }, []);
 
-    const handleAuth = () => setShowAuth(false);
+    // const handleAuth = () => setShowAuth(false);
     return (
         <>
             {showAuth && <AuthModal open={showAuth} onOpenChange={setShowAuth} />}
