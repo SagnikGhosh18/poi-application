@@ -10,17 +10,16 @@ import {
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { login, signup } from '@/services/authService';
+import { redirect } from 'react-router-dom';
 
 interface AuthModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    // onAuth: () => void;
 }
 
 export default function AuthModal({
     open,
     onOpenChange,
-    // onAuth,
 }: AuthModalProps) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -45,8 +44,8 @@ export default function AuthModal({
             setPassword('');
             setError('');
 
-            // onAuth();
             onOpenChange(false);
+            redirect('/');
         } catch (err: any) {
             setError(err.message);
         } finally {

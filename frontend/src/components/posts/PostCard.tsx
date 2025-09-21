@@ -33,8 +33,10 @@ const PostCard = ({
     const formatTimestamp = (timestamp: string) => {
         const date = new Date(timestamp);
         const now = new Date();
-        const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-        
+        const diffInHours = Math.floor(
+            (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+        );
+
         if (diffInHours < 1) return 'now';
         if (diffInHours < 24) return `${diffInHours}h`;
         const diffInDays = Math.floor(diffInHours / 24);
@@ -44,7 +46,7 @@ const PostCard = ({
 
     const handleLike = async () => {
         setLiked(prev => !prev);
-        setLikes(prev => liked ? prev - 1 : prev + 1);
+        setLikes(prev => (liked ? prev - 1 : prev + 1));
         const token = localStorage.getItem('token');
         try {
             if (!liked) await likePost(token!, id);
@@ -52,18 +54,18 @@ const PostCard = ({
         } catch (e) {
             // Optionally revert UI on error
             setLiked(liked);
-
         }
     };
 
     const handleShare = async () => {
         // ...existing share logic
-        setShares(shares + 1);
+        setShares(prev => prev + 1);
         const token = localStorage.getItem('token');
         try {
             await sharePost(token!, id);
         } catch (e) {
             // Optionally revert UI on error
+            setShares(prev => prev - 1);
         }
     };
 
@@ -87,7 +89,7 @@ const PostCard = ({
                     src={imageUrl}
                     alt={`Post by ${username}`}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
+                    onError={e => {
                         console.error('Image failed to load:', imageUrl);
                         e.currentTarget.style.display = 'none';
                     }}
@@ -109,7 +111,9 @@ const PostCard = ({
                     >
                         <Heart
                             className={`h-6 w-6 transition-all duration-200 ${
-                                liked ? 'fill-current scale-110' : 'hover:scale-110'
+                                liked
+                                    ? 'fill-current scale-110'
+                                    : 'hover:scale-110'
                             }`}
                         />
                         <span className="text-sm font-semibold">{likes}</span>
@@ -128,7 +132,9 @@ const PostCard = ({
 
                 {/* Caption */}
                 <div className="text-sm leading-relaxed">
-                    <span className="font-semibold text-gray-900 mr-2">{username}</span>
+                    <span className="font-semibold text-gray-900 mr-2">
+                        {username}
+                    </span>
                     <span className="text-gray-900">{caption}</span>
                 </div>
             </div>

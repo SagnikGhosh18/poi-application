@@ -1,7 +1,3 @@
-// import { Toaster } from "@/components/ui/toaster";
-// import { Toaster as Sonner } from "@/components/ui/sonner";
-// import { TooltipProvider } from "@/components/ui/tooltip";
-// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home, NotFound } from './pages';
 import { useEffect, useState } from 'react';
@@ -15,7 +11,6 @@ const App = () => {
         if (!getToken()) setShowAuth(true);
     }, []);
 
-    // const handleAuth = () => setShowAuth(false);
     return (
         <>
             {showAuth && <AuthModal open={showAuth} onOpenChange={setShowAuth} />}
@@ -27,13 +22,6 @@ const App = () => {
             </BrowserRouter>
         </>
     );
-    // <QueryClientProvider client={queryClient}>
-    //   <TooltipProvider>
-    //     <Toaster />
-    //     <Sonner />
-
-    //   </TooltipProvider>
-    // </QueryClientProvider>
 };
 
 export default App;

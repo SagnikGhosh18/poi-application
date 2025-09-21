@@ -27,9 +27,6 @@ export async function createPost(token: string, formData: FormData) {
     const res = await fetch(`${API_BASE}/posts`, {
         method: 'POST',
         headers: {
-            // NOTE: Do NOT set the 'Content-Type' header.
-            // The browser automatically sets it to 'multipart/form-data'
-            // with the correct boundary when the body is a FormData object.
             Authorization: `Bearer ${token}`,
         },
         body: formData,
