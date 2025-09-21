@@ -58,14 +58,26 @@ const PostCard = ({
     };
 
     const handleShare = async () => {
-        // ...existing share logic
+        // This is an optimistic UI update
         setShares(prev => prev + 1);
         const token = localStorage.getItem('token');
+    
         try {
-            await sharePost(token!, id);
+            // 1. Call the API and wait for the response
+            const response = await sharePost(token!, id);
+    
+            // 2. Check if a shareUrl was returned and copy it
+            if (response && response.shareUrl) {
+                await navigator.clipboard.writeText(response.shareUrl);
+                
+                // 3. IMPORTANT: Give the user feedback
+                alert('Link copied to clipboard!'); // A toast notification is a better UX
+            }
         } catch (e) {
-            // Optionally revert UI on error
+            // Revert the UI update if the API call fails
             setShares(prev => prev - 1);
+            alert('Failed to share post.'); // Inform the user of the error
+            console.error(e);
         }
     };
 

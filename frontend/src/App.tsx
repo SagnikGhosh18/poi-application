@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home, NotFound } from './pages';
+import { Home, NotFound, PostDetail } from './pages';
 import { useEffect, useState } from 'react';
 import { getToken } from '@/services/authService';
 import AuthModal from '@/components/authmodal/AuthModal';
@@ -17,6 +17,7 @@ const App = () => {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/posts/:id" element={<PostDetail />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </BrowserRouter>

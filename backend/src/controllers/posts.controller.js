@@ -221,7 +221,16 @@ exports.sharePost = async (req, res) => {
     // ... existing checks for post existence and self-sharing ...
     try {
         await db.query('INSERT INTO shares (post_id, username) VALUES ($1, $2)', [id, username]);
-        res.status(201).json({ message: 'Post shared successfully' });
+
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+        const shareUrl = `${clientUrl}/posts/${id}`;
+
+        // 3. Send the URL back in the response
+        res.status(201).json({ 
+            message: 'Post shared successfully',
+            shareUrl: shareUrl 
+        });
+
     } catch (e) {
         if (e.code === '23505') {
             return res.status(409).json({ error: 'You have already shared this post' });

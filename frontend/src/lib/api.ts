@@ -13,7 +13,7 @@ export interface Post {
 }
 
 export async function getPosts(token: string, page = 1, limit = 20) {
-    if(!token) {
+    if (!token) {
         throw new Error('No token provided');
     }
     const res = await fetch(`${API_BASE}/posts?page=${page}&limit=${limit}`, {
@@ -21,6 +21,23 @@ export async function getPosts(token: string, page = 1, limit = 20) {
     });
     if (!res.ok) throw new Error('Failed to fetch posts');
     return res.json();
+}
+
+export async function getPostById(token: string, id: string) {
+    const response = await fetch(`${API_BASE}/posts/${id}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch post');
+    }
+
+    return await response.json();
 }
 
 export async function createPost(token: string, formData: FormData) {
@@ -31,12 +48,12 @@ export async function createPost(token: string, formData: FormData) {
         },
         body: formData,
     });
-    
+
     if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || 'Failed to create post');
     }
-    
+
     return res.json();
 }
 
