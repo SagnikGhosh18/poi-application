@@ -1,6 +1,15 @@
-# backend/nixpacks.toml
+# railway.toml
 
-[phases.setup]
-# This tells Nixpacks to install the PostgreSQL package, 
-# which includes the `psql` command-line client.
+[build]
+builder = "nixpacks"
+
+[build.nixpacks]
+# This ensures the `psql` command is available
 pkgs = ["postgresql"]
+
+[deploy]
+# This command now runs your "postdeploy" script first,
+# and if it succeeds, it starts your main application.
+startCommand = "npm run postdeploy && npm start"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
