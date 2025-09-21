@@ -21,7 +21,7 @@ const Header = () => {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="hidden md:flex text-primary hover:text-primary hover:bg-primary/10"
+                    className="flex text-primary hover:text-primary hover:bg-primary/10"
                     onClick={() => {
                         // Navigate to create post - will implement with routing
                         setShowCreateModal(true);
