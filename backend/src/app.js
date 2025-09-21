@@ -6,6 +6,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
+const db = require('./config/database');
+
 const authRoutes = require('./routes/auth.routes');
 const postRoutes = require('./routes/posts.routes');
 // const uploadRoutes = require('./routes/upload.routes');
@@ -35,7 +37,7 @@ const limiter = rateLimit({
 
 const checkDbConnection = async () => {
     try {
-        await pool.query('SELECT NOW()'); // A simple, fast query
+        await db.query('SELECT NOW()'); // A simple, fast query
         console.log('✅ Database connected successfully!');
     } catch (error) {
         console.error('❌ Database connection failed:', error);
