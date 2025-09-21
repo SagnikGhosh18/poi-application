@@ -30,6 +30,18 @@ const limiter = rateLimit({
     max: 100, // limit each IP to 100 requests per windowMs
     message: 'Too many requests from this IP, please try again later.'
 });
+
+// DB healthcheck
+
+const checkDbConnection = async () => {
+    try {
+        await pool.query('SELECT NOW()'); // A simple, fast query
+        console.log('✅ Database connected successfully!');
+    } catch (error) {
+        console.error('❌ Database connection failed:', error);
+    }
+};
+
 app.use('/api/', limiter);
 
 // Body parsing
@@ -43,6 +55,7 @@ app.use('/api/posts', postRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
+    checkDbConnection();
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
