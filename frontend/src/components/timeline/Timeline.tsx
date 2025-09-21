@@ -7,10 +7,10 @@ interface Post {
     username: string;
     imageUrl: string;
     caption: string;
-    timestamp: string;
-    initialLikes: number;
-    initialShares: number;
-    isLiked?: boolean;
+    createdAt: string;
+    likesCount: number;
+    sharesCount: number;
+    isLikedByUser?: boolean;
 }
 
 // Mock data for demonstration

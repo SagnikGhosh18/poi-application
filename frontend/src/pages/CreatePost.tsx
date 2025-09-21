@@ -8,7 +8,20 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { createPost } from '@/lib/api';
+import { createPost, getPosts } from '@/lib/api';
+
+// Helper function to convert a Base64 data URL into a Blob object
+function dataURLtoBlob(dataurl: string): Blob {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+}
 
 interface CreatePostModalProps {
     open: boolean;
@@ -37,7 +50,6 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
                     }
                 })
                 .catch(err => {
-                    // Handle error (permission denied, etc)
                     console.error('Camera error:', err);
                 });
         }
@@ -71,20 +83,43 @@ const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
     };
 
     const handlePost = async () => {
+        if (!capturedImage) return;
         setIsLoading(true);
-        const token = localStorage.getItem('token');
-        // Simulate API call
-        await createPost(token!, capturedImage!, caption);
 
-        // Reset form and close modal
-        setStep('camera');
-        setCapturedImage(null);
-        setCaption('');
-        setIsLoading(false);
-        onOpenChange(false);
+        try {
+            const token = localStorage.getItem('token');
+            
+            // Convert the Base64 data URL to a Blob
+            const imageBlob = dataURLtoBlob(capturedImage);
 
-        // TODO: Add new post to timeline and show success toast
-        console.log('Post created successfully!');
+            // Create a FormData object for the multipart request
+            const formData = new FormData();
+            
+            // Append the image file (as a blob) and the caption
+            // The field name 'image' must match what multer expects on the backend
+            formData.append('image', imageBlob, 'capture.png');
+            formData.append('caption', caption);
+
+            // Call the API function with the FormData object
+            await createPost(token!, formData);
+
+            await getPosts(token!); 
+
+            // Reset form and close modal on success
+            setStep('camera');
+            setCapturedImage(null);
+            setCaption('');
+            onOpenChange(false);
+            
+            // NOTE: You'll likely want to add success handling here
+            // (e.g., show a toast, refetch the posts on your feed)
+            console.log('Post created successfully!');
+        } catch (error) {
+            console.error('Failed to create post:', error);
+            // NOTE: Add user-facing error handling here
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleModalOpenClose = (isOpen: boolean) => {

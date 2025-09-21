@@ -23,16 +23,23 @@ export async function getPosts(token: string, page = 1, limit = 20) {
     return res.json();
 }
 
-export async function createPost(token: string, imageUrl: string, caption: string) {
+export async function createPost(token: string, formData: FormData) {
     const res = await fetch(`${API_BASE}/posts`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            // NOTE: Do NOT set the 'Content-Type' header.
+            // The browser automatically sets it to 'multipart/form-data'
+            // with the correct boundary when the body is a FormData object.
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ imageUrl, caption }),
+        body: formData,
     });
-    if (!res.ok) throw new Error('Failed to create post');
+    
+    if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to create post');
+    }
+    
     return res.json();
 }
 

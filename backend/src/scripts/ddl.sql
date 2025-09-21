@@ -1,5 +1,5 @@
--- src/scripts/ddl.sql
--- Fixed version with proper syntax
+-- src/scripts/ddl_with_blobs.sql
+-- Modified version to store image data as blobs
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -17,11 +17,14 @@ CREATE TABLE IF NOT EXISTS users (
     CONSTRAINT username_format CHECK (username ~ '^[a-zA-Z0-9_]+$')
 );
 
--- Posts table with engagement counters
+-- Posts table with engagement counters and image blob storage
 CREATE TABLE IF NOT EXISTS posts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(30) NOT NULL REFERENCES users(username) ON UPDATE CASCADE,
-    image_url TEXT NOT NULL,
+    -- Removed image_url, added columns for blob data
+    image_data BYTEA NOT NULL,
+    mime_type VARCHAR(50) NOT NULL, -- To store file type e.g., 'image/png'
+    filename VARCHAR(255),          -- Optional: To store original filename
     caption TEXT,
     likes_count INTEGER DEFAULT 0 CHECK (likes_count >= 0),
     shares_count INTEGER DEFAULT 0 CHECK (shares_count >= 0),
@@ -40,7 +43,7 @@ CREATE TABLE IF NOT EXISTS likes (
     UNIQUE(post_id, username)
 );
 
--- Shares tracking table (this is likely where the syntax error was)
+-- Shares tracking table
 CREATE TABLE IF NOT EXISTS shares (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
@@ -143,21 +146,24 @@ BEGIN
 END $$;
 
 -- Create database views for common queries
+-- MODIFIED: Removed image_url as it no longer exists.
+-- NOTE: We do NOT include the BYTEA column in the view for performance reasons.
 CREATE OR REPLACE VIEW post_stats AS
 SELECT 
     p.id,
     p.username,
-    p.image_url,
     p.caption,
     p.likes_count,
     p.shares_count,
     p.created_at,
+    p.mime_type, -- Added mime_type to the view
+    p.filename,  -- Added filename to the view
     COUNT(DISTINCT l.username) as actual_likes,
     COUNT(DISTINCT s.username) as actual_shares
 FROM posts p
 LEFT JOIN likes l ON p.id = l.post_id
 LEFT JOIN shares s ON p.id = s.post_id
-GROUP BY p.id, p.username, p.image_url, p.caption, p.likes_count, p.shares_count, p.created_at;
+GROUP BY p.id, p.username, p.caption, p.likes_count, p.shares_count, p.created_at, p.mime_type, p.filename;
 
 -- Grant permissions
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;

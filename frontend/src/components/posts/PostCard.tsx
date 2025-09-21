@@ -9,10 +9,10 @@ interface PostCardProps {
     username: string;
     imageUrl: string;
     caption: string;
-    timestamp: string;
-    initialLikes: number;
-    initialShares: number;
-    isLiked?: boolean;
+    createdAt: string;
+    likesCount: number;
+    sharesCount: number;
+    isLikedByUser?: boolean;
 }
 
 const PostCard = ({
@@ -20,18 +20,31 @@ const PostCard = ({
     username,
     imageUrl,
     caption,
-    timestamp,
-    initialLikes,
-    initialShares,
-    isLiked = false,
+    createdAt,
+    likesCount,
+    sharesCount,
+    isLikedByUser = false,
 }: PostCardProps) => {
-    const [likes, setLikes] = useState(initialLikes);
-    const [shares, setShares] = useState(initialShares);
-    const [liked, setLiked] = useState(isLiked);
+    const [likes, setLikes] = useState(likesCount);
+    const [shares, setShares] = useState(sharesCount);
+    const [liked, setLiked] = useState(isLikedByUser);
+
+    // Format timestamp for display
+    const formatTimestamp = (timestamp: string) => {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+        
+        if (diffInHours < 1) return 'now';
+        if (diffInHours < 24) return `${diffInHours}h`;
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 7) return `${diffInDays}d`;
+        return date.toLocaleDateString();
+    };
 
     const handleLike = async () => {
-        setLiked(!liked);
-        setLikes(liked ? likes - 1 : likes + 1);
+        setLiked(prev => !prev);
+        setLikes(prev => liked ? prev - 1 : prev + 1);
         const token = localStorage.getItem('token');
         try {
             if (!liked) await likePost(token!, id);
@@ -63,7 +76,7 @@ const PostCard = ({
                         {username}
                     </span>
                     <span className="text-xs text-gray-500 font-normal">
-                        {timestamp}
+                        {formatTimestamp(createdAt)}
                     </span>
                 </div>
             </div>
@@ -74,6 +87,10 @@ const PostCard = ({
                     src={imageUrl}
                     alt={`Post by ${username}`}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                        console.error('Image failed to load:', imageUrl);
+                        e.currentTarget.style.display = 'none';
+                    }}
                 />
             </div>
 
