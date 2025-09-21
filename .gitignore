@@ -8,6 +8,10 @@ backend/dist/
 frontend/.env
 backend/.env
 
+# Logs
+*.log
+backend/logs/
+
 # IDE files
 .vscode/
 .idea/

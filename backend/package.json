@@ -7,8 +7,10 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "jest",
-    "db:migrate": "node src/scripts/migrate.js",
-    "db:seed": "node src/scripts/seed.js"
+    "db:setup": "cat src/scripts/ddl.sql | docker-compose exec -T postgres psql -U postgres -d poi_sharing_app",
+    "db:seed": "cat src/scripts/seed.sql | docker-compose exec -T postgres psql -U postgres -d poi_sharing_app",
+    "db:init": "npm run db:setup && npm run db:seed",
+    "db:reset": "docker-compose down -v && docker-compose up -d postgres && npm run db:init"
   },
   "dependencies": {
     "express": "^4.18.2",
