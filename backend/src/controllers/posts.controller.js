@@ -42,7 +42,6 @@ exports.createPost = async (req, res) => {
 // 2. Get All Posts (paginated)
 exports.getAllPosts = async (req, res) => {
     const username = req.user.username;
-    console.log("Here");
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const offset = (page - 1) * limit;
